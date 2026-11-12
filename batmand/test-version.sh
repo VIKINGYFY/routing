@@ -2,7 +2,8 @@
 
 case "$PKG_NAME" in
 batmand)
-	batmand -v 2>&1 | grep -q "^B.A.T.M.A.N. $(echo "$PKG_VERSION" | sed 's/.*~//')"
+	# Date-based package versions are separate from the upstream Git revision.
+	batmand -v 2>&1 | grep -Eq '^B[.]A[.]T[.]M[.]A[.]N[.] [0-9a-f]{40} [(]compatibility version [0-9]+[)]$'
 	;;
 
 *)

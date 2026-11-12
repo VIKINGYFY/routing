@@ -100,10 +100,15 @@ end
 
 function peerstats_join(addrLine)
     local pubkey = addrLine:sub(addrLine:len() - 53)
-    local process = io.popen("/usr/bin/publictoip6 " .. pubkey, "r")
-    local ipv6 = process:read()
-    local label = 'label'
-    process:close()
+    local ipv6 = ""
+    if #pubkey == 54 and pubkey:match("^[a-z0-9]+%.k$") then
+        local process = io.popen("/usr/bin/cjdnstool util key2ip6 " .. pubkey, "r")
+        if process then
+            local result = process:read("*l") or ""
+            process:close()
+            ipv6 = result:match("^%S+%s+([%x:]+)$") or ""
+        end
+    end
     local version = addrLine:match("^(v%w+)%.") or 'v0'
     local label = addrLine:sub(version:len() + 2, version:len() + 20)
     return { pubkey=pubkey, ipv6=ipv6, label=label, version=version }

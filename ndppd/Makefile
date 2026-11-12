@@ -8,19 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ndppd
-PKG_VERSION:=0.2.6
+PKG_VERSION:=20261113
 PKG_RELEASE:=1
 
-# Latest release
-PKG_SOURCE_URL:=https://codeload.github.com/DanielAdolfsson/ndppd/tar.gz/$(PKG_VERSION)?
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_HASH:=969d438462e0c65a8c9060d8d263c5c47ba8145fb9aaa663864bbad11ad7eb7a
-PKG_LICENSE:=GPL-3.0-or-later
+PKG_SOURCE_DATE:=2026-10-17
+PKG_SOURCE_VERSION:=a8d5bc06b672d5ad7d53ccacc793851e1328d599
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-a8d5bc06b672.tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/DanielAdolfsson/ndppd/tar.gz/$(PKG_SOURCE_VERSION)?
+PKG_HASH:=6e67d904ada509085f4ba5c4867278d2e7718fb2e53ffe4f257e0d5a427ff2af
+PKG_BUILD_DIR:=$(BUILD_DIR)/ndppd-a8d5bc06b672d5ad7d53ccacc793851e1328d599
 
-# Development snapshot
-#PKG_SOURCE_URL=git://github.com/DanielAdolfsson/ndppd.git
-#PKG_SOURCE_VERSION=master
-#PKG_SOURCE_SUBDIR=$(PKG_NAME)-$(PKG_VERSION)
+PKG_LICENSE:=GPL-3.0-or-later
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -30,7 +28,7 @@ define Package/ndppd
   TITLE:=NDP Proxy Daemon
   URL:=http://www.priv.nu/projects/ndppd/
   MAINTAINER:=Gabriel Kerneis <gabriel@kerneis.info>
-  DEPENDS:=@IPV6 +libstdcpp
+  DEPENDS:=@IPV6
 endef
 
 define Package/ndppd/description
@@ -49,12 +47,7 @@ define Package/ndppd/conffiles
 endef
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR) \
-		CXX="$(TARGET_CXX)" \
-		CXXFLAGS="$(TARGET_CXXFLAGS) -std=c++0x -fno-rtti" \
-		LDFLAGS="$(TARGET_LDFLAGS)" \
-		LIBS="-lc" \
-		ndppd
+	$(call Build/Compile/Default,ndppd)
 endef
 
 define Package/ndppd/install

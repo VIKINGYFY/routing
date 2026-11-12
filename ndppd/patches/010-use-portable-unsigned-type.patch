@@ -1,0 +1,15 @@
+Subject: [PATCH] ndppd: use a portable unsigned integer type
+
+The non-standard uint typedef is unavailable with musl.
+
+--- a/src/ndppd.h
++++ b/src/ndppd.h
+@@ -149,7 +149,7 @@
+     char name[IF_NAMESIZE];
+     nd_lladdr_t lladdr;
+ 
+-    uint index;
++    unsigned int index;
+ 
+     nd_proxy_t *proxy;
+ 

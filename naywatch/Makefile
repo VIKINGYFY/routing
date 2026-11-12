@@ -6,8 +6,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=naywatch
-PKG_VERSION:=1
-PKG_RELEASE:=8
+PKG_VERSION:=20261113
+PKG_UPSTREAM_VERSION:=1
+PKG_RELEASE:=1
 
 PKG_MAINTAINER:=Nick Hainke <vincent@systemli.org>
 PKG_LICENSE:=GPL-2.0-only

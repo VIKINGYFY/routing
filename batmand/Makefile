@@ -8,7 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=batmand
-PKG_RELEASE:=3
+PKG_VERSION:=20261113
+PKG_SOURCE_SUBDIR:=batmand-2022.12.31~2f62b17d
+PKG_SOURCE:=$(PKG_SOURCE_SUBDIR).tar.zst
+PKG_RELEASE:=1
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://git.open-mesh.org/batmand.git

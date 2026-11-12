@@ -17,19 +17,25 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=cjdns
-PKG_VERSION:=21.1
-PKG_RELEASE:=6
+PKG_VERSION:=20261113
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/cjdelisle/cjdns/tar.gz/$(PKG_NAME)-v$(PKG_VERSION)?
-PKG_HASH:=a6158ce7847159aa44e86f74ccc7b6ded6910a230ed8f3830db53cda5838f0b0
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_NAME)-v$(PKG_VERSION)
+PKG_SOURCE_DATE:=2025-12-10
+PKG_SOURCE_VERSION:=f5902acab6dd2f1a68bf6e4c89e352ed71f93698
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-f5902acab6dd.tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/cjdelisle/cjdns/tar.gz/$(PKG_SOURCE_VERSION)?
+PKG_HASH:=cdd781e69066813e920d6e5c5d45a188ca0144a3f159a2ecb461d91ada46481e
+PKG_BUILD_DIR:=$(BUILD_DIR)/cjdns-f5902acab6dd2f1a68bf6e4c89e352ed71f93698
 
 PKG_MAINTAINER:=William Fleurant <meshnet@protonmail.com>
 PKG_LICENSE:=GPL-3.0-or-later
 PKG_LICENSE_FILES:=LICENSE
 
+PKG_BUILD_DEPENDS:=rust/host node/host
+PKG_BUILD_PARALLEL:=1
+
 include $(INCLUDE_DIR)/package.mk
+include $(TOPDIR)/feeds/packages/lang/rust/rust-package.mk
 
 define Package/cjdns
 	SECTION:=net
@@ -37,7 +43,7 @@ define Package/cjdns
 	SUBMENU:=Routing and Redirection
 	TITLE:=Encrypted near-zero-conf mesh routing protocol
 	URL:=https://github.com/cjdelisle/cjdns
-	DEPENDS:=@!arc @IPV6 +kmod-tun +libnl-tiny +libpthread +librt \
+	DEPENDS:=$(RUST_ARCH_DEPENDS) @IPV6 +kmod-tun +libnl-tiny +libpthread +librt \
 		+libuci-lua +lua-bencode +dkjson +luasocket +lua-sha2
 endef
 
@@ -54,17 +60,17 @@ define Package/cjdns-tests
 	SUBMENU:=Routing and Redirection
 	TITLE:=cjdns test cases
 	URL:=https://github.com/cjdelisle/cjdns
-	DEPENDS:=+libpthread +librt @!arc
+	DEPENDS:=$(RUST_ARCH_DEPENDS) +libpthread +librt
 endef
 
-define Package/cjdns-test/description
-	Builds cjdns test cases binary test_testcjdroute_c
+define Package/cjdns-tests/description
+	Builds cjdns test cases binary testcjdroute
 endef
 
 define Build/Configure
 endef
 
-PKG_DO_VARS:=CJDNS_RELEASE_VERSION=$(PKG_SOURCE_VERSION)
+PKG_DO_VARS:=CJDNS_RELEASE_VERSION=$(PKG_VERSION)
 
 ifneq ($(CONFIG_KERNEL_SECCOMP_FILTER),y)
 PKG_DO_VARS+= Seccomp_NO=1
@@ -75,21 +81,20 @@ PKG_DO_VARS+= UCLIBC=1
 endif
 
 define Build/Compile
-	$(INSTALL_DIR) $(PKG_BUILD_DIR)/tmp
-	(cd $(PKG_BUILD_DIR) && \
-	CROSS="true" \
-	CC="$(TARGET_CC_NOCACHE)" \
-	AR="$(TARGET_AR)" \
-	RANLIB="$(TARGET_RANLIB)" \
-	CFLAGS="$(TARGET_CFLAGS) -U_FORTIFY_SOURCE -Wno-error=array-bounds -Wno-error=stringop-overflow -Wno-error=stringop-overread -Wno-error=calloc-transposed-args" \
-	LDFLAGS="$(TARGET_LDFLAGS)" \
-	SYSTEM="linux" \
-	TARGET_ARCH="$(CONFIG_ARCH)" \
-	SSP_SUPPORT="$(CONFIG_SSP_SUPPORT)" \
-	GYP_ADDITIONAL_ARGS="-f make-linux" \
-	CJDNS_BUILD_TMPDIR="$(PKG_BUILD_DIR)/tmp" \
-	$(PKG_DO_VARS) \
-	exec ./do)
+	$(CARGO_PKG_VARS) \
+		CROSS=true \
+		CC="$(TARGET_CC_NOCACHE)" \
+		AR="$(TARGET_AR)" \
+		RANLIB="$(TARGET_RANLIB)" \
+		CFLAGS="$(TARGET_CFLAGS) -U_FORTIFY_SOURCE" \
+		LDFLAGS="$(TARGET_LDFLAGS)" \
+		SYSTEM=linux \
+		TARGET_ARCH="$(ARCH)" \
+		SSP_SUPPORT="$(CONFIG_SSP_SUPPORT)" \
+		$(PKG_DO_VARS) \
+		cargo build --manifest-path $(PKG_BUILD_DIR)/Cargo.toml \
+			--workspace --bins --profile $(CARGO_PKG_PROFILE) \
+			$(CARGO_PKG_ARGS) $(if $(filter --jobserver%,$(PKG_JOBS)),,-j1)
 endef
 
 define Package/cjdns/install
@@ -107,11 +112,11 @@ define Package/cjdns/install
 		$(1)/usr/bin
 
 	$(INSTALL_BIN) \
-		$(PKG_BUILD_DIR)/cjdroute \
+		$(PKG_BUILD_DIR)/target/$(RUSTC_TARGET_ARCH)/$(CARGO_PKG_PROFILE)/cjdroute \
 		$(1)/usr/sbin
 
 	$(INSTALL_BIN) \
-		$(PKG_BUILD_DIR)/publictoip6 \
+		$(PKG_BUILD_DIR)/target/$(RUSTC_TARGET_ARCH)/$(CARGO_PKG_PROFILE)/cjdnstool \
 		$(1)/usr/bin
 
 	$(INSTALL_BIN) \
@@ -143,7 +148,7 @@ endef
 define Package/cjdns-tests/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) \
-		$(PKG_BUILD_DIR)/build_linux/test_testcjdroute_c \
+		$(PKG_BUILD_DIR)/target/$(RUSTC_TARGET_ARCH)/$(CARGO_PKG_PROFILE)/testcjdroute \
 		$(1)/usr/bin
 endef
 

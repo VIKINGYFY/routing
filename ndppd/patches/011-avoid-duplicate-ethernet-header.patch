@@ -1,0 +1,14 @@
+Subject: [PATCH] ndppd: use the libc Ethernet header on Linux
+
+Including both libc and Linux definitions redefines ethhdr on musl.
+
+--- a/src/iface.c
++++ b/src/iface.c
+@@ -33,7 +33,6 @@
+ 
+ #ifdef __linux__
+ #    include <linux/filter.h>
+-#    include <linux/if_ether.h>
+ #    include <linux/if_link.h>
+ #    include <linux/if_packet.h>
+ #    include <linux/netlink.h>

@@ -8,12 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=prince
-PKG_VERSION:=0.4
-PKG_RELEASE:=3
+PKG_VERSION:=20261113
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/AdvancedNetworkingSystems/prince/archive/refs/tags/v$(PKG_VERSION).tar.gz?
-PKG_HASH:=9e3ce87343f5ea1d66757f8c704b62ff47d5eb245a191cf1e6a9ec106c5da90e
+PKG_SOURCE_DATE:=2019-01-16
+PKG_SOURCE_VERSION:=dde658a7814a8948f690b60a9196833e4cf72291
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-dde658a7814a.tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/AdvancedNetworkingSystems/prince/tar.gz/$(PKG_SOURCE_VERSION)?
+PKG_HASH:=3be3e00e14c481cc104e6742da36ff4bbc60770334fbfe884bf646e2a95b07b6
+PKG_BUILD_DIR:=$(BUILD_DIR)/prince-dde658a7814a8948f690b60a9196833e4cf72291
 
 PKG_MAINTAINER:=Gabriele Gemmi <gabriel@autistici.org>
 PKG_LICENSE:=MIT
